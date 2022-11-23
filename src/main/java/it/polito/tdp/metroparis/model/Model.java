@@ -8,12 +8,24 @@ import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
+import org.jgrapht.traverse.BreadthFirstIterator;
+import org.jgrapht.traverse.GraphIterator;
 
 import it.polito.tdp.metroparis.db.MetroDAO;
 
 public class Model {
 
 	private Graph <Fermata, DefaultEdge> grafo;
+	
+	
+	//Visita grafo
+	public void visitaGrafo(Fermata partenza) {
+		GraphIterator<Fermata, DefaultEdge> visita= new BreadthFirstIterator<>(this.grafo, partenza);
+		while(visita.hasNext()) {
+			Fermata f= visita.next();
+			System.out.println(f);
+		}
+	}
 	
 	
 	public void creaGrafo() {
@@ -81,9 +93,10 @@ public class Model {
 			this.grafo.addEdge(fermateIdMap.get(coppia.idPartenza), fermateIdMap.get(coppia.idArrivo));
 		}
 		
-		
 		System.out.println("Vertici: "+this.grafo.vertexSet().size());
-		
 		System.out.println("Archi: "+this.grafo.edgeSet().size());
+		
+		System.out.println("\n ");
+		visitaGrafo(fermate.get(0));
 	}
 }
