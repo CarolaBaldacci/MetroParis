@@ -18,7 +18,7 @@ public class Model {
 	private Graph <Fermata, DefaultEdge> grafo;
 	
 	
-	//Visita grafo
+//VISITA GRAFO
 	public void visitaGrafo(Fermata partenza) {
 		GraphIterator<Fermata, DefaultEdge> visita= new BreadthFirstIterator<>(this.grafo, partenza);
 		while(visita.hasNext()) {
@@ -27,7 +27,7 @@ public class Model {
 		}
 	}
 	
-	
+//CREAZIONE GRAFO	
 	public void creaGrafo() {
 		this.grafo = new SimpleDirectedGraph<Fermata, DefaultEdge>(DefaultEdge.class);
 		
@@ -46,16 +46,16 @@ public class Model {
 		
 	//creo ARCHI
 		//METODO 1 : itero su ogni coppia di vertici, metodo lungo
-		/*for(Fermata partenza: fermate) {
+		for(Fermata partenza: fermate) {
 			for(Fermata arrivo: fermate ) {
 				if(dao.isFermateConnesse(partenza, arrivo)){  //esiste almeno una connessione
 			    	this.grafo.addEdge(partenza, arrivo);
 		    	}
 			}
-		}*/
+		}
 		
 		//METODO2: per ogni vertice , cerco i vertici ad esso adiacenti
-		/*for( Fermata partenza: fermate) {
+		for( Fermata partenza: fermate) {
 			List<Integer> idConnesse= dao.getIdFermateConnesse(partenza);
 			for(Integer id: idConnesse) {
 				Fermata arrivo =null;
@@ -67,25 +67,25 @@ public class Model {
 				}
 				this.grafo.addEdge(partenza, arrivo);
 			}
-		}*/
+		}
 		
 		//METODO 2b: il DAO restituisce un elenco di oggetti fermata
-		/*for(Fermata partenza:fermate) {
+		for(Fermata partenza:fermate) {
 			List<Fermata> arrivi= dao.getFermateConnesse(partenza);
 			for(Fermata arrivo :arrivi) {
 				this.grafo.addEdge(partenza, arrivo);
 			}
-		  }*/
+		  }
 		
 		//METODO 2c [IDENTITY MAP]: il DAO restituisce un elenco di id numerici,
 		//che converto in oggetti tramite una Map<Integer,Fermata (preferita)
-		/*for(Fermata partenza:fermate) {
+		for(Fermata partenza:fermate) {
 			List<Integer> idConnesse= dao.getIdFermateConnesse(partenza);
 			for(int id : idConnesse) {
 				Fermata arrivo= fermateIdMap.get(id);
 				this.grafo.addEdge(partenza, arrivo);
 			}
-		}*/
+		}
 		
 		//METODO 3 [delego al database]: faccio una sola query che restituisca la coppia di fermate da collegare
 		List<CoppiaId> fermateDaCollegare=dao.getCoppiaFermateConnesse();
