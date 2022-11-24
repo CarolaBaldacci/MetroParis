@@ -1,5 +1,6 @@
 package it.polito.tdp.metroparis.model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,33 +18,74 @@ public class Model {
 
 	private Graph <Fermata, DefaultEdge> grafo;
 	
+	private List <Fermata> fermate;
+	private Map<Integer, Fermata> fermateIdMap;
+	
+	public List <Fermata> getFermate(){
+		MetroDAO dao = new MetroDAO();
+		
+		if(this.fermate==null)
+			this.fermate= dao.getAllFermate();
+		
+		this.fermateIdMap = new HashMap<Integer,Fermata>();
+		for(Fermata f: this.fermate) {
+			this.fermateIdMap.put(f.getIdFermata(), f);
+		}
+		return this.fermate;
+	}
+	
+	
+//CALCOLO CAMMINO	
+	public List <Fermata> calcolaPercorso(Fermata partenza, Fermata arrivo){
+		creaGrafo();
+		Map<Fermata, Fermata> alberoInverso = visitaGrafo(partenza);
+		Fermata corrente=arrivo;
+		List<Fermata> percorso= new ArrayList<>();
+		
+		while(corrente!=null) {
+			percorso.add(0, corrente); //aggiungo nodo precedente finchè questo non è null ==>partenza
+			corrente=alberoInverso.get(corrente);
+		}
+		return percorso;
+	}
+	
 	
 //VISITA GRAFO
-	public void visitaGrafo(Fermata partenza) {
+	public Map<Fermata, Fermata>  visitaGrafo(Fermata partenza) {
 		GraphIterator<Fermata, DefaultEdge> visita= new BreadthFirstIterator<>(this.grafo, partenza);
+		//registro il percorso
+		
+		Map<Fermata, Fermata> alberoInverso = new HashMap<>();
+		alberoInverso.put(partenza, null);
+		
+		visita.addTraversalListener(new RegistraAlberoDiVisita(alberoInverso, this.grafo));
 		while(visita.hasNext()) {
-			Fermata f= visita.next();
-			System.out.println(f);
+			//Fermata f=
+			visita.next();
 		}
+		
+		return alberoInverso;
+		/*
+		List<Fermata> percorso = new ArrayList<>();
+		while(fermata!=null) {
+			fermata=alberoInverso.get(fermata);
+			percorso.add(fermata);
+		}*/
+		
+		
 	}
 	
 //CREAZIONE GRAFO	
-	public void creaGrafo() {
+	private void creaGrafo() {
 		this.grafo = new SimpleDirectedGraph<Fermata, DefaultEdge>(DefaultEdge.class);
-		
 		
 	    //creo VERTICI
 		MetroDAO dao= new MetroDAO();
-		List<Fermata> fermate =dao.getAllFermate();
-		Map<Integer, Fermata> fermateIdMap= new HashMap<Integer,Fermata>();
-		for(Fermata f: fermate) {
-			fermateIdMap.put(f.getIdFermata(), f);
-		}
 		
 		//this.grafo.addVertex(fermata);
 		Graphs.addAllVertices(this.grafo, fermate);
 		System.out.println(this.grafo);
-		
+	/*	
 	//creo ARCHI
 		//METODO 1 : itero su ogni coppia di vertici, metodo lungo
 		for(Fermata partenza: fermate) {
@@ -86,6 +128,8 @@ public class Model {
 				this.grafo.addEdge(partenza, arrivo);
 			}
 		}
+	*/	
+		
 		
 		//METODO 3 [delego al database]: faccio una sola query che restituisca la coppia di fermate da collegare
 		List<CoppiaId> fermateDaCollegare=dao.getCoppiaFermateConnesse();
@@ -93,10 +137,12 @@ public class Model {
 			this.grafo.addEdge(fermateIdMap.get(coppia.idPartenza), fermateIdMap.get(coppia.idArrivo));
 		}
 		
+		/*
 		System.out.println("Vertici: "+this.grafo.vertexSet().size());
 		System.out.println("Archi: "+this.grafo.edgeSet().size());
 		
 		System.out.println("\n ");
 		visitaGrafo(fermate.get(0));
+		*/
 	}
 }
