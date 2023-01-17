@@ -71,8 +71,6 @@ public class Model {
 			fermata=alberoInverso.get(fermata);
 			percorso.add(fermata);
 		}*/
-		
-		
 	}
 	
 //CREAZIONE GRAFO	
@@ -146,3 +144,4 @@ public class Model {
 		*/
 	}
 }
+
